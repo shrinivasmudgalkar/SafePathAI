@@ -1,132 +1,88 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafePath AI | Pedestrian Safety</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f7fb;
-      color: #17324d;
-    }
-
-    header {
-      background: #102a43;
-      color: white;
-      padding: 22px 8%;
-    }
-
-    header h1 {
-      margin: 0;
-    }
-
-    header p {
-      margin-bottom: 0;
-      color: #c8d9e8;
-    }
-
-    main {
-      max-width: 950px;
-      margin: 45px auto;
-      padding: 0 20px;
-    }
-
-    .hero, .feature {
-      background: white;
-      border-radius: 14px;
-      padding: 28px;
-      margin-bottom: 22px;
-      box-shadow: 0 4px 16px #102a4310;
-    }
-
-    .hero h2 {
-      font-size: 32px;
-      margin-top: 0;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
-
-    .feature h3 {
-      color: #087e8b;
-    }
-
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 12px 18px;
-      background: #087e8b;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    footer {
-      text-align: center;
-      padding: 24px;
-      color: #52677b;
-    }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<title>SafePath AI | Pedestrian Safety</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root{--navy:#102a43;--teal:#087e8b;--paper:#f3f7fb;--ink:#193247;--muted:#61778a;--line:#dbe5ed;--white:#fff;--shadow:0 10px 28px #102a4310}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{background:var(--navy);color:white;padding:15px max(20px,calc((100vw - 1180px)/2));display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:sticky;top:0;z-index:500}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.2rem}.logo{background:var(--teal);border-radius:12px;padding:8px 10px;font-size:1.4rem}nav{display:flex;gap:16px;flex-wrap:wrap;margin-left:auto}nav a{color:#e1edf5;text-decoration:none;font-size:.92rem}nav a:hover{text-decoration:underline}
+main{max-width:1180px;margin:auto;padding:26px 20px 50px}.hero{padding:clamp(26px,5vw,52px);border-radius:24px;color:white;background:linear-gradient(120deg,#102a43,#174d68 65%,#087e8b);box-shadow:var(--shadow)}.eyebrow{color:#b9f1e8;text-transform:uppercase;letter-spacing:1.5px;font-size:.75rem;font-weight:800}.hero h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:12px 0}.hero p{max-width:700px;color:#e0edf5}.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:750;display:inline-block}.primary{background:var(--teal);color:white}.light{background:white;color:var(--navy)}.outline{background:white;border:1px solid var(--line);color:var(--ink)}.hero .btn{margin:8px 8px 0 0}
+.head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin:30px 0 14px;flex-wrap:wrap}.head h2{margin:0;font-size:1.45rem}.head p{margin:3px 0 0;color:var(--muted);font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat,.panel,.card{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:18px}.stat span{color:var(--muted);font-size:.86rem}.stat strong{display:block;font-size:2rem;color:var(--navy);line-height:1.3}
+#map{height:410px;border-radius:16px;overflow:hidden;border:1px solid var(--line);z-index:1}.mapnote{font-size:.82rem;color:var(--muted);margin-top:8px}
+.panel{padding:22px}.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;min-width:0}.full{grid-column:1/-1}label{font-size:.86rem;font-weight:750}input,select,textarea{width:100%;border:1px solid #cbd8e2;border-radius:9px;padding:10px;background:white;color:var(--ink)}textarea{min-height:92px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid #087e8b44;border-color:var(--teal)}.hint{color:var(--muted);font-size:.77rem}.coords{display:grid;grid-template-columns:1fr 1fr;gap:8px}.photo{max-width:100%;max-height:190px;object-fit:cover;border-radius:10px;display:none;margin-top:8px}.notice{background:#fff8e9;border:1px solid #f3d39b;border-radius:10px;padding:12px;font-size:.82rem;margin-bottom:15px;color:#764b0a}.consent{display:flex;align-items:flex-start;gap:9px;font-size:.82rem;font-weight:500;color:var(--muted)}.consent input{width:auto;margin-top:5px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{width:auto;min-width:145px;flex:1}.reports{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{overflow:hidden}.card img{width:100%;height:145px;object-fit:cover;background:#eaf0f4;display:block}.cardbody{padding:15px}.card h3{font-size:1rem;margin:0}.topline{display:flex;justify-content:space-between;gap:10px}.badge{border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:800;background:#fff0d8;color:#8a4b00;white-space:nowrap}.badge.In-Progress{background:#e2efff;color:#1c55a5}.badge.Resolved{background:#dff5e8;color:#17683b}.meta{font-size:.78rem;color:var(--muted);margin:9px 0}.desc{font-size:.88rem;overflow-wrap:anywhere}.statusrow{display:flex;align-items:center;gap:8px;border-top:1px solid #edf1f4;padding-top:10px}.statusrow select{max-width:145px;margin-left:auto;padding:7px;font-size:.8rem}.empty{grid-column:1/-1;text-align:center;border:1px dashed #c5d4df;border-radius:14px;padding:32px;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:.82rem;padding:25px}.toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:white;padding:12px 16px;border-radius:10px;display:none;z-index:1200;max-width:90vw}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}nav{margin-left:0;width:100%}}
+@media(max-width:520px){main{padding:16px 12px 35px}.fieldgrid,.reports{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:15px}#map{height:330px}.hero{border-radius:17px}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:1.65rem}}
+</style>
 </head>
-
 <body>
-  <header>
-    <h1>SafePath AI</h1>
-    <p>Safer, more accessible journeys for everyone.</p>
-  </header>
-
-  <main>
-    <section class="hero">
-      <h2>Make every path safer.</h2>
-      <p>
-        SafePath AI is a pedestrian-safety concept for reporting
-        hazards and helping people identify accessibility issues
-        in their surroundings.
-      </p>
-      <button onclick="showMessage()">Explore SafePath AI</button>
-      <p id="message" aria-live="polite"></p>
-    </section>
-
-    <section class="features">
-      <article class="feature">
-        <h3>Report Hazards</h3>
-        <p>Help document issues such as damaged footpaths
-        and obstacles using a future connected reporting system.</p>
-      </article>
-
-      <article class="feature">
-        <h3>Location Awareness</h3>
-        <p>Support location-based safety information
-        with permission from the user.</p>
-      </article>
-
-      <article class="feature">
-        <h3>Accessible Routes</h3>
-        <p>Highlight the importance of safer and more
-        accessible pedestrian infrastructure.</p>
-      </article>
-    </section>
-  </main>
-
-  <footer>
-    SafePath AI · Pedestrian safety for everyone
-  </footer>
-
-  <script>
-    function showMessage() {
-      document.getElementById("message").textContent =
-        "Welcome to SafePath AI!";
-    }
-  </script>
+<header><div class="brand"><span class="logo">🧭</span><span>SafePath AI<br><small style="font-weight:400;color:#c6d9e7;font-size:.72rem">Safer paths, stronger communities</small></span></div><nav><a href="#dashboard">Dashboard</a><a href="#map-section">Map</a><a href="#report">Report hazard</a><a href="#reports">Reports</a></nav></header>
+<main>
+<section class="hero"><div class="eyebrow">Community-powered pedestrian safety</div><h1>Make every path<br>safer and more accessible.</h1><p>Report footpath hazards, highlight accessibility barriers, and explore community-submitted issues on an interactive map.</p><a class="btn light" href="#map-section">Explore map ↗</a><a class="btn primary" href="#report">＋ Submit a report</a></section>
+<section id="dashboard"><div class="head"><div><h2>Community overview</h2><p>Totals update as demo reports are added or changed.</p></div><span class="hint">DEMO · STORED IN THIS BROWSER</span></div><div class="stats"><div class="stat"><span>Total reports</span><strong id="total">0</strong></div><div class="stat"><span>Open issues</span><strong id="open">0</strong></div><div class="stat"><span>In progress</span><strong id="progress">0</strong></div><div class="stat"><span>Resolved</span><strong id="resolved">0</strong></div></div></section>
+<div class="head" id="map-section"><div><h2>Hazard map</h2><p>Click anywhere on the map to select report coordinates.</p></div><button class="btn outline" id="get-map-location" type="button">◎ Use my location</button></div><div id="map" aria-label="Interactive hazard map"></div><p class="mapnote">Map data © OpenStreetMap contributors. Location is optional; browser permission is required to use your current location.</p>
+<div class="head" id="report"><div><h2>Report a pedestrian hazard</h2><p>Do not include personal or sensitive information.</p></div></div>
+<section class="panel">
+<div class="notice"><strong>Demo/privacy notice:</strong> Reports are saved only in this browser's local storage. This site does not send reports to authorities or share them with other visitors. Use fictional/sample data and avoid identifiable people or private addresses.</div>
+<form id="form"><div class="fieldgrid">
+<div class="field"><label for="category">Hazard category *</label><select id="category" required><option value="">Choose category</option><option>Damaged footpath</option><option>Blocked walkway</option><option>Missing curb ramp</option><option>Unsafe crossing</option><option>Poor lighting</option><option>Construction obstacle</option><option>Other accessibility issue</option></select></div>
+<div class="field"><label for="severity">Severity *</label><select id="severity" required><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+<div class="field full"><label for="description">Description *</label><textarea id="description" minlength="8" maxlength="500" required placeholder="Describe the hazard in 8–500 characters…"></textarea></div>
+<div class="field"><label for="area">Area / public landmark *</label><input id="area" maxlength="100" required placeholder="e.g. Near a public bus stop"></div>
+<div class="field"><label for="date">Date noticed *</label><input id="date" type="date" required></div>
+<div class="field full"><label>Coordinates (optional)</label><div class="coords"><input id="lat" type="number" min="-90" max="90" step="any" placeholder="Latitude"><input id="lng" type="number" min="-180" max="180" step="any" placeholder="Longitude"></div><span class="hint">Click the map or use location permission to fill these.</span><button class="btn outline" type="button" id="get-form-location" style="margin-top:8px;align-self:flex-start">◎ Get my location</button></div>
+<div class="field full"><label for="photo">Optional hazard photo (JPG, PNG, WebP; max 1 MB)</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><img id="preview" class="photo" alt="Selected hazard photo preview"><span class="hint">Choose a photo of the hazard only. Avoid faces, licence plates, and private details.</span></div>
+<div class="field full"><label class="consent"><input id="consent" type="checkbox" required><span>I understand this is a local demo and I will use appropriate, non-sensitive sample information.</span></label></div>
+</div><button class="btn primary" type="submit">Submit demo report</button> <button class="btn outline" type="reset">Clear form</button></form>
+</section>
+<div class="head" id="reports"><div><h2>Community reports</h2><p>Search, filter, and update demo report statuses.</p></div><button class="btn outline" id="export">↓ Export JSON</button></div>
+<div class="toolbar"><input type="search" id="search" placeholder="Search area or description…" aria-label="Search reports"><select id="filter-category" aria-label="Filter category"><option value="">All categories</option><option>Damaged footpath</option><option>Blocked walkway</option><option>Missing curb ramp</option><option>Unsafe crossing</option><option>Poor lighting</option><option>Construction obstacle</option><option>Other accessibility issue</option></select><select id="filter-status" aria-label="Filter status"><option value="">All statuses</option><option>Open</option><option>In Progress</option><option>Resolved</option></select><select id="filter-severity" aria-label="Filter severity"><option value="">All severity</option><option>Low</option><option>Medium</option><option>High</option></select><button class="btn outline" id="clear">Clear filters</button></div>
+<section id="reports-list" class="reports" aria-live="polite"></section>
+<footer>SafePath AI · GitHub Pages static demo · Not an emergency service.</footer>
+</main><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+"use strict";
+const KEY="safepath_pages_demo_v2",MAX_PHOTO=1024*1024,$=id=>document.getElementById(id);
+let photoData="",chosenMarker=null;
+const dateNow=()=>new Date().toISOString().slice(0,10);
+$("date").value=dateNow();
+function readReports(){try{const saved=localStorage.getItem(KEY);if(saved)return JSON.parse(saved)}catch(e){console.warn(e)}return[
+{id:"demo1",category:"Damaged footpath",severity:"High",description:"Sample report: uneven pavement may be difficult to navigate.",area:"Demo area A",date:dateNow(),status:"Open",lat:12.9716,lng:77.5946,photo:"",created:3},
+{id:"demo2",category:"Blocked walkway",severity:"Medium",description:"Sample report: a temporary obstacle narrows the pedestrian path.",area:"Demo area B",date:dateNow(),status:"In Progress",lat:12.976,lng:77.6,photo:"",created:2},
+{id:"demo3",category:"Missing curb ramp",severity:"Low",description:"Sample report: curb transition could be improved for accessibility.",area:"Demo area C",date:dateNow(),status:"Resolved",lat:12.965,lng:77.585,photo:"",created:1}]}
+let reports=readReports();
+function toast(msg){const el=$("toast");el.textContent=msg;el.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display="none",3400)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(reports));return true}catch(e){toast("Browser storage is full. Remove a photo or export your reports.");return false}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+const map=L.map("map").setView([12.9716,77.5946],13);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+const markers=L.layerGroup().addTo(map);
+function statusColor(s){return s==="Resolved"?"#16a34a":s==="In Progress"?"#2563eb":"#d97706"}
+function choosePoint(lat,lng){$("lat").value=Number(lat).toFixed(6);$("lng").value=Number(lng).toFixed(6);if(chosenMarker)map.removeLayer(chosenMarker);chosenMarker=L.marker([lat,lng],{draggable:true}).addTo(map).bindPopup("Selected report location").openPopup();chosenMarker.on("dragend",()=>{const p=chosenMarker.getLatLng();$("lat").value=p.lat.toFixed(6);$("lng").value=p.lng.toFixed(6)})}
+map.on("click",e=>{choosePoint(e.latlng.lat,e.latlng.lng);toast("Location selected.")});
+function drawMap(){markers.clearLayers();reports.forEach(r=>{if(r.lat==null||r.lng==null||!Number.isFinite(+r.lat)||!Number.isFinite(+r.lng))return;L.circleMarker([+r.lat,+r.lng],{radius:8,color:"#fff",weight:2,fillColor:statusColor(r.status),fillOpacity:.95}).bindPopup(`<b>${esc(r.category)}</b><br>${esc(r.area)}<br>Status: ${esc(r.status)}<br>${esc(r.severity)} severity`).addTo(markers)})}
+function stats(){$("total").textContent=reports.length;$("open").textContent=reports.filter(r=>r.status==="Open").length;$("progress").textContent=reports.filter(r=>r.status==="In Progress").length;$("resolved").textContent=reports.filter(r=>r.status==="Resolved").length}
+function visible(){const q=$("search").value.trim().toLowerCase(),cat=$("filter-category").value,st=$("filter-status").value,sev=$("filter-severity").value;return [...reports].sort((a,b)=>b.created-a.created).filter(r=>(!q||`${r.category} ${r.area} ${r.description}`.toLowerCase().includes(q))&&(!cat||r.category===cat)&&(!st||r.status===st)&&(!sev||r.severity===sev))}
+function drawReports(){const list=$("reports-list"),rows=visible();if(!rows.length){list.innerHTML='<div class="empty">No reports match your filters. Try clearing filters or add a demo report.</div>';return}list.innerHTML=rows.map(r=>`<article class="card">${r.photo?`<img src="${r.photo}" alt="Hazard photo">`:`<div style="height:95px;display:grid;place-items:center;background:#eaf0f4;font-size:2rem">📍</div>`}<div class="cardbody"><div class="topline"><h3>${esc(r.category)}</h3><span class="badge ${r.status.replace(/\s/g,"-")}">${esc(r.status)}</span></div><div class="meta">📍 ${esc(r.area)} · ${esc(r.severity)} severity · ${esc(r.date)}</div><p class="desc">${esc(r.description)}</p><div class="statusrow"><label for="s-${esc(r.id)}">Status</label><select id="s-${esc(r.id)}" data-status="${esc(r.id)}">${["Open","In Progress","Resolved"].map(s=>`<option ${s===r.status?"selected":""}>${s}</option>`).join("")}</select><button class="btn outline" data-delete="${esc(r.id)}">Delete</button></div></div></article>`).join("")}
+function render(){stats();drawReports();drawMap()}
+function getLocation(){if(!navigator.geolocation){toast("Geolocation is not supported by this browser.");return}toast("Requesting location permission…");navigator.geolocation.getCurrentPosition(p=>{choosePoint(p.coords.latitude,p.coords.longitude);map.setView([p.coords.latitude,p.coords.longitude],16);toast("Location selected. Review it before submitting.")},e=>toast(e.code===1?"Location permission denied. Click the map instead.":"Could not get location. You can click the map instead."),{enableHighAccuracy:true,timeout:10000,maximumAge:60000})}
+$("get-map-location").onclick=getLocation;$("get-form-location").onclick=getLocation;
+$("photo").addEventListener("change",e=>{const f=e.target.files[0],img=$("preview");photoData="";if(!f){img.style.display="none";return}if(!["image/jpeg","image/png","image/webp"].includes(f.type)||f.size>MAX_PHOTO){e.target.value="";img.style.display="none";toast("Choose a JPG, PNG, or WebP image up to 1 MB.");return}const reader=new FileReader();reader.onload=()=>{photoData=String(reader.result);img.src=photoData;img.style.display="block"};reader.onerror=()=>toast("Could not read that image.");reader.readAsDataURL(f)});
+$("form").addEventListener("reset",()=>{photoData="";$("preview").style.display="none";setTimeout(()=>$("date").value=dateNow(),0)});
+$("form").addEventListener("submit",e=>{e.preventDefault();const a=$("lat").value.trim(),b=$("lng").value.trim();if((a&&!b)||(!a&&b)){toast("Enter both coordinates or leave both blank.");return}const lat=a?Number(a):null,lng=b?Number(b):null;if(a&&(!Number.isFinite(lat)||lat < -90||lat>90)){toast("Latitude must be between -90 and 90.");return}if(b&&(!Number.isFinite(lng)||lng < -180||lng>180)){toast("Longitude must be between -180 and 180.");return}
+const r={id:(crypto.randomUUID?crypto.randomUUID():"r"+Date.now()),category:$("category").value,severity:$("severity").value,description:$("description").value.trim(),area:$("area").value.trim(),date:$("date").value,status:"Open",lat,lng,photo:photoData,created:Date.now()};reports.unshift(r);if(!save()){reports.shift();return}render();e.target.reset();if(lat!=null)map.setView([lat,lng],15);toast("Demo report saved in this browser.");$("reports").scrollIntoView({behavior:"smooth"})});
+$("reports-list").addEventListener("change",e=>{const id=e.target.dataset.status;if(!id)return;const r=reports.find(x=>x.id===id);if(!r)return;r.status=e.target.value;save();render();toast("Report status updated.")});
+$("reports-list").addEventListener("click",e=>{const b=e.target.closest("[data-delete]");if(!b)return;if(!confirm("Delete this demo report from this browser?"))return;reports=reports.filter(r=>r.id!==b.dataset.delete);save();render();toast("Demo report deleted.")});
+["search","filter-category","filter-status","filter-severity"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",drawReports));
+$("clear").onclick=()=>{["search","filter-category","filter-status","filter-severity"].forEach(id=>$(id).value="");drawReports()};
+$("export").onclick=()=>{const data=reports.map(({photo,...r})=>({...r,photo:photo?"[photo omitted]":""}));const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="safepath-demo-reports.json";a.click();URL.revokeObjectURL(url);toast("Report data exported. Photos are omitted.")};
+render();setTimeout(()=>map.invalidateSize(),200);
+</script>
 </body>
 </html>
