@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafePath AI | Pedestrian Safety</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f7fb;
+      color: #17324d;
+    }
+
+    header {
+      background: #102a43;
+      color: white;
+      padding: 22px 8%;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header p {
+      margin-bottom: 0;
+      color: #c8d9e8;
+    }
+
+    main {
+      max-width: 950px;
+      margin: 45px auto;
+      padding: 0 20px;
+    }
+
+    .hero, .feature {
+      background: white;
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 16px #102a4310;
+    }
+
+    .hero h2 {
+      font-size: 32px;
+      margin-top: 0;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .feature h3 {
+      color: #087e8b;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      background: #087e8b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #52677b;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>SafePath AI</h1>
+    <p>Safer, more accessible journeys for everyone.</p>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Make every path safer.</h2>
+      <p>
+        SafePath AI is a pedestrian-safety concept for reporting
+        hazards and helping people identify accessibility issues
+        in their surroundings.
+      </p>
+      <button onclick="showMessage()">Explore SafePath AI</button>
+      <p id="message" aria-live="polite"></p>
+    </section>
+
+    <section class="features">
+      <article class="feature">
+        <h3>Report Hazards</h3>
+        <p>Help document issues such as damaged footpaths
+        and obstacles using a future connected reporting system.</p>
+      </article>
+
+      <article class="feature">
+        <h3>Location Awareness</h3>
+        <p>Support location-based safety information
+        with permission from the user.</p>
+      </article>
+
+      <article class="feature">
+        <h3>Accessible Routes</h3>
+        <p>Highlight the importance of safer and more
+        accessible pedestrian infrastructure.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    SafePath AI · Pedestrian safety for everyone
+  </footer>
+
+  <script>
+    function showMessage() {
+      document.getElementById("message").textContent =
+        "Welcome to SafePath AI!";
+    }
+  </script>
+</body>
+</html>
