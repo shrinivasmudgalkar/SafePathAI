@@ -729,15 +729,24 @@ footer {
         </div>
       </div>
 
-      <div class="form-grid">
-        <div class="field">
-          <label for="lat">Latitude (optional)</label>
-          <input id="lat" type="number" step="any" min="-90" max="90" placeholder="12.9716">
+      <div class="field">
+        <label>Hazard location (optional)</label>
+        <div class="form-grid">
+          <div>
+            <label for="lat">Latitude</label>
+            <input id="lat" type="number" step="any" min="-90" max="90" placeholder="12.9716">
+          </div>
+          <div>
+            <label for="lng">Longitude</label>
+            <input id="lng" type="number" step="any" min="-180" max="180" placeholder="77.5946">
+          </div>
         </div>
-        <div class="field">
-          <label for="lng">Longitude (optional)</label>
-          <input id="lng" type="number" step="any" min="-180" max="180" placeholder="77.5946">
+        <div class="btn-row">
+          <button class="small-btn" type="button" id="useMyLocationBtn">◎ Use My Current Location</button>
+          <button class="small-btn" type="button" id="pickOnMapBtn">⌖ Pick Location on Map</button>
+          <button class="small-btn" type="button" id="clearLocationBtn">Clear Coordinates</button>
         </div>
+        <p id="locationStatus" class="sub" aria-live="polite">You can enter coordinates, use GPS, or select a point on the map.</p>
       </div>
 
       <label class="checkline">
@@ -809,11 +818,16 @@ footer {
 <!-- LOCATION -->
 <section class="view" id="locationview">
   <section class="panel form-panel">
-    <h2>♙ Live Location</h2>
-    <div class="notice">This demo does not track or store your live location.</div>
-    <p class="sub">Explore fictional sample hazards on the safety map. No GPS permission is requested.</p>
-    <br>
-    <button class="primary" data-goto="mapview">Open Safety Map</button>
+    <h2>♙ Location Tools</h2>
+    <div class="notice">Your location is accessed only after you press the button and approve your browser's permission request. The demo does not continuously track you.</div>
+    <p class="sub">Use GPS to find your current coordinates, or select a point on the safety map to attach a location to a hazard report.</p>
+    <div class="btn-row">
+      <button class="primary" type="button" id="locationPageGpsBtn">◎ Get My Current Location</button>
+      <button class="small-btn" type="button" data-goto="mapview">Open Safety Map</button>
+      <button class="small-btn" type="button" data-goto="reportview">Return to Report Form</button>
+    </div>
+    <p id="locationPageStatus" aria-live="polite"></p>
+    <p class="sub">Coordinates are added to a report only when you submit that report. This is a browser-based educational demo.</p>
   </section>
 </section>
 
@@ -1149,7 +1163,110 @@ function initializeMap(elementId) {
   ).addTo(map);
 
   maps.push(map);
+
+  // Clicking the map selects a location for the report form.
+  map.on("click", event => {
+    const latitude = event.latlng.lat;
+    const longitude = event.latlng.lng;
+    $("lat").value = latitude.toFixed(6);
+    $("lng").value = longitude.toFixed(6);
+    $("locationStatus").textContent =
+      `Selected map location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    $("locationPageStatus").textContent =
+      `Selected coordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    if (selectedLocationLayer) {
+      maps.forEach(existingMap => {
+        if (existingMap.hasLayer(selectedLocationLayer)) existingMap.removeLayer(selectedLocationLayer);
+      });
+    }
+    selectedLocationLayer = L.circleMarker([latitude, longitude], {
+      radius: 8, color: "#ffffff", weight: 2, fillColor: "#24d8e5", fillOpacity: 1
+    }).bindPopup("Selected report location");
+    selectedLocationLayer.addTo(map);
+    showToast("Location selected. You can return to the report form.");
+    if (map.getContainer().id === "mapLarge") {
+      navigate("reportview");
+    }
+  });
 }
+
+let selectedLocationLayer = null;
+
+function getCurrentLocation() {
+  const status = $("locationStatus");
+  const pageStatus = $("locationPageStatus");
+
+  if (!navigator.geolocation) {
+    const message = "This browser does not support location access. Enter coordinates manually or pick a map point.";
+    status.textContent = message;
+    pageStatus.textContent = message;
+    showToast(message);
+    return;
+  }
+
+  status.textContent = "Requesting location permission…";
+  pageStatus.textContent = "Requesting location permission…";
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      $("lat").value = latitude.toFixed(6);
+      $("lng").value = longitude.toFixed(6);
+      const message = `Location added: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}. Submit the report to save it.`;
+      status.textContent = message;
+      pageStatus.textContent = message;
+
+      if (maps.length) {
+        maps.forEach(map => map.setView([latitude, longitude], 15));
+        if (selectedLocationLayer) {
+          maps.forEach(map => {
+            if (map.hasLayer(selectedLocationLayer)) map.removeLayer(selectedLocationLayer);
+          });
+        }
+        selectedLocationLayer = L.circleMarker([latitude, longitude], {
+          radius: 8, color: "#ffffff", weight: 2, fillColor: "#24d8e5", fillOpacity: 1
+        }).bindPopup("Selected report location");
+        if (maps[0]) selectedLocationLayer.addTo(maps[0]);
+      }
+
+      showToast("Current coordinates added to the report form.");
+    },
+    error => {
+      let message = "Unable to get your location. ";
+      if (error.code === 1) message += "Permission was denied.";
+      else if (error.code === 2) message += "Your location is unavailable.";
+      else if (error.code === 3) message += "The request timed out.";
+      else message += "Check your browser settings.";
+      message += " You can enter coordinates or pick a map point instead.";
+      status.textContent = message;
+      pageStatus.textContent = message;
+      showToast(message);
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+  );
+}
+
+$("useMyLocationBtn").addEventListener("click", getCurrentLocation);
+$("locationPageGpsBtn").addEventListener("click", getCurrentLocation);
+
+$("pickOnMapBtn").addEventListener("click", () => {
+  navigate("mapview");
+  showToast("Click anywhere on the map to select the hazard location.");
+});
+
+$("clearLocationBtn").addEventListener("click", () => {
+  $("lat").value = "";
+  $("lng").value = "";
+  $("locationStatus").textContent = "Coordinates cleared.";
+  $("locationPageStatus").textContent = "Coordinates cleared.";
+  if (selectedLocationLayer) {
+    maps.forEach(map => {
+      if (map.hasLayer(selectedLocationLayer)) map.removeLayer(selectedLocationLayer);
+    });
+    selectedLocationLayer = null;
+  }
+});
 
 $("mapFilters").addEventListener("click", event => {
   const button = event.target.closest("[data-severity]");
